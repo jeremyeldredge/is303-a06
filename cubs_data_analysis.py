@@ -13,7 +13,7 @@ Inputs:
 
 Processes:
 - load_data(): reads CSV into DataFrame
-- clean_data(): convert numbers from strings, clean player names
+- clean_data(): delete pitchers from hittig data, clean player names
 - validate_data(): assert no negative stats, verifies all values not null
 - analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO rate of starters vs releivers (pitchers)
 - create_chart(): bar chart of HR by salary
@@ -25,4 +25,33 @@ Outputs:
 - ERA and SO rate starters vs releivers (printed table)
 """
 
-import pandas as pd
+import pandas as pd 
+import matplotlib.pyplot as plt
+
+def load_hitting_data(filepath):
+    # load CSV and return a DataFrame
+    df_hitting = pd.read_csv(filepath)
+    print(f"Loaded {len(df_hitting)} rows from {filepath}")
+    return df_hitting
+
+def load_pitching_data(filepath):
+    # load CSV and return a DataFrame
+    df_pitching = pd.read_csv(filepath)
+    print(f"Loaded {len(df_pitching)} rows from {filepath}")
+    return df_pitching
+
+load_hitting_data("cubs_hitting_data.csv")
+load_pitching_data("cubs_pitching_data.csv")
+
+# clean data: remove pitchers from hitting data, remove symbols from names
+def clean_hitter_data(df):
+
+    # remove rows of players with no batting average (pitchers)
+    df_hitting =df_hitting.dropna(subset=["BA"])
+
+    # remove (#) or (*) from end of player names
+    df_hitting["Player"]=df_hitting["Player"].str.rstrip("*#")
+
+def clean_pitcher_data(df):
+    # remove (#) or (*) from end of player names
+    df_pitching["Player"]=df_pitching["Player"].str.rstrip("*#")
