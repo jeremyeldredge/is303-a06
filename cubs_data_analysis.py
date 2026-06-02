@@ -15,6 +15,14 @@ Processes:
 - load_data(): reads CSV into DataFrame
 - clean_data(): convert numbers from strings, clean player names
 - validate_data(): assert no negative stats, verifies all values not null
-- analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO rate of starters vs releivers (pitchers), 
-    
+- analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO rate of starters vs releivers (pitchers)
+- create_chart(): bar chart of HR by salary
+
+Outputs:
+- Avg age of pitchers and hitters (printed table)
+- Batting average per defensive position (printed table)
+- Bar chart of HR by salary (HR/$) saved as HR_by_salary.png
+- ERA and SO rate starters vs releivers (printed table)
 """
+
+import pandas as pd
