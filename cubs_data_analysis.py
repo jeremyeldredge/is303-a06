@@ -15,14 +15,14 @@ Processes:
 - load_data(): reads CSV into DataFrame
 - clean_data(): delete pitchers from hittig data, clean player names
 - validate_data(): assert no negative stats, verifies all values not null
-- analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO rate of starters vs releivers (pitchers)
+- analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO/BB rate of starters vs releivers (pitchers)
 - create_chart(): bar chart of HR by salary
 
 Outputs:
 - Avg age of pitchers and hitters (printed table)
 - Batting average per defensive position (printed table)
 - Bar chart of HR by salary (HR/$) saved as HR_by_salary.png
-- ERA and SO rate starters vs releivers (printed table)
+- ERA and SO/BB rate starters vs releivers (printed table)
 """
 
 import pandas as pd 
@@ -40,8 +40,8 @@ def load_pitching_data(filepath):
     print(f"Loaded {len(df_pitching)} rows from {filepath}")
     return df_pitching
 
-load_hitting_data("cubs_hitting_data.csv")
-load_pitching_data("cubs_pitching_data.csv")
+df_hitting = load_hitting_data("cubs_hitting_data.csv")
+df_pitching = load_pitching_data("cubs_pitching_data.csv")
 
 # clean data: remove pitchers from hitting data, remove symbols from names
 def clean_hitter_data(df):
@@ -52,14 +52,29 @@ def clean_hitter_data(df):
     # remove (#) or (*) from end of player names
     df["Player"] = df["Player"].str.rstrip("*#")
 
-    print(f"Cleaned {len(df)} rows from {df}")
+    # remove awards and Player-additional columns
+    df = df.drop(columns=['Awards','Player-additional'])
+
+    print(f"Cleaned {len(df)} rows from cubs_hitting_data.csv")
     return df
 
 def clean_pitcher_data(df):
     # remove (#) or (*) from end of player names
     df["Player"] = df["Player"].str.rstrip("*#")
-    print(f"Cleaned {len(df)} rows from {df}")
+
+    # remove pitchers with null SO/BB values
+    df = df.dropna(subset=["SO/BB"])
+
+    # remove awards and Player-additional columns
+    df = df.drop(columns=['Awards','Player-additional'])
+
+    print(f"Cleaned {len(df)} rows from cubs_pitching_data.csv")
     return df
 
-clean_hitter_data("cubs_hitting_data.csv")
-clean_pitcher_data("cubs_pitching_data.csv")
+df_hitting = clean_hitter_data(df_hitting)
+df_pitching = clean_pitcher_data(df_pitching)
+
+def validate_data(df):
+    assert
+    assert
+    assert
