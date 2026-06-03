@@ -47,11 +47,19 @@ load_pitching_data("cubs_pitching_data.csv")
 def clean_hitter_data(df):
 
     # remove rows of players with no batting average (pitchers)
-    df_hitting =df_hitting.dropna(subset=["BA"])
+    df = df.dropna(subset=["BA"])
 
     # remove (#) or (*) from end of player names
-    df_hitting["Player"]=df_hitting["Player"].str.rstrip("*#")
+    df["Player"] = df["Player"].str.rstrip("*#")
+
+    print(f"Cleaned {len(df)} rows from {df}")
+    return df
 
 def clean_pitcher_data(df):
     # remove (#) or (*) from end of player names
-    df_pitching["Player"]=df_pitching["Player"].str.rstrip("*#")
+    df["Player"] = df["Player"].str.rstrip("*#")
+    print(f"Cleaned {len(df)} rows from {df}")
+    return df
+
+clean_hitter_data("cubs_hitting_data.csv")
+clean_pitcher_data("cubs_pitching_data.csv")
