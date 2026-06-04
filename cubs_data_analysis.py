@@ -6,6 +6,7 @@ Chicago Cubs Data Anlysis
 Analyzes data from the current 2026 MLB season to find star players.
 
 Inputs:
+- csv data from baseball-reference.com
 - cubs_hitting_data.csv: 22 rows, columns: Rk,Player,Age,Pos,WAR,G,PA,AB,R,H,2B,3B,HR,RBI,SB,CS,BB,SO,
     BA,OBP,SLG,OPS,OPS+,rOBA,Rbat+,TB,GIDP,HBP,SH,SF,IBB,Pos,Awards,Player-additional
 - cubs_pitching_data.csv: 28 rows, columns: Rk,Player,Age,Pos,WAR,W,L,W-L%,ERA,G,GS,GF,CG,SHO,SV,IP,H,
@@ -75,6 +76,10 @@ df_hitting = clean_hitter_data(df_hitting)
 df_pitching = clean_pitcher_data(df_pitching)
 
 def validate_data(df):
-    assert
-    assert
-    assert
+    assert df["BA"].notna().all(), "BA still has missing values"
+    assert df["SO/BB"].notna().all(), "SO/BB still has missing values"
+    assert len(df) > 0, "DataFrame is empty after cleaning"
+
+def analyze_hitting_data(df):
+    hitter_avg_age = df[df['Age'].mean()]
+    
