@@ -81,6 +81,11 @@ def validate_data(df):
     assert len(df) > 0, "DataFrame is empty after cleaning"
 
 def analyze_hitting_data(df):
+<<<<<<< HEAD
     
     hitter_avg_age = df[df['Age'].mean()]
     return f"Average age of hitters: {hitter_avg_age:.1f}"
+=======
+    hitter_avg_age = df[df['Age'].mean()]
+    
+>>>>>>> e15e8bfc15b47a20199ba34d7d8ce72fedaa0870
