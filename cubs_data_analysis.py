@@ -50,10 +50,7 @@ def load_contract_data(filepath):
     print(f"Loaded {len(df_contracts)} rows from {filepath}")
     return df_contracts
 
-df_hitting = load_hitting_data("cubs_hitting_data.csv")
-df_pitching = load_pitching_data("cubs_pitching_data.csv")
-df_contracts = load_contract_data("cubs_contracts_data.csv")
-print("="*50)
+
 
 # clean data: remove pitchers from hitting data, remove symbols from names
 def clean_hitter_data(df):
@@ -62,10 +59,13 @@ def clean_hitter_data(df):
     df = df.dropna(subset=["BA"])
 
     # remove (#) or (*) from end of player names
-    df["Player"] = df["Player"].str.rstrip("*#")
+    df["Player"] = df["Player"].str.replace("*","").str.replace("#","")
 
     # remove awards and Player-additional columns
     df = df.drop(columns=['Awards','Player-additional'])
+
+    df['Player']=df['Player'].str.replace(" (10-day IL)","")
+    df = df[df['Player'] != 'Team Totals']
 
     print(f"Cleaned {len(df)} rows from cubs_hitting_data.csv")
     return df
@@ -102,24 +102,27 @@ def clean_contracts_data(df):
    print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv")
    return df
 
-df_hitting = clean_hitter_data(df_hitting)
-df_pitching = clean_pitcher_data(df_pitching)
-df_contracts = clean_contracts_data(df_contracts)
-print("="*50)
+
 
 # data validation
 def validate_hitter_data(df):
     assert df["BA"].notna().all(), "BA still has missing values"
     assert len(df) > 0, "DataFrame is empty after cleaning"
+    print(f"Validated {len(df)} rows of hitter data")
+    return df
 
 def validate_pitcher_data(df):
     assert df["SO/BB"].notna().all(), "SO/BB still has missing values"
     assert len(df) > 0, "DataFrame is empty after cleaning"
+    print(f"Validated {len(df)} rows of pitcher data")
+    return df
 
 def validate_contracts_data(df):
     assert df["2026"].notna().all(), "2026 salary still has missing values"
     assert (df['2026'] > 0).all(), "2026 has zero or negative salaries"
     assert len(df) > 0, "DataFrame is empty after cleaning"
+    print(f"Validated {len(df)} rows of contract data")
+    return df
 
 # data analysis
 # avg age of pitchers vs hitters (both), OPS by defensive position (hitters), WAR by salary (hitters), SO/BB rate of starters vs releivers (pitchers)
@@ -135,11 +138,12 @@ def analyze_hitting_data(df):
     df_merged["WAR per dollar"] = df_merged['WAR'] / df_merged['2026']
     print(df_merged.groupby('Player')['WAR per dollar'].mean().sort_values(ascending=False))
 
+    # chart must be created inside this function because df_merged is not global
     plt.scatter(df_merged['WAR'], df_merged['2026'], color='green')
     plt.title("WAR per Dollar - 2026 Chicago Cubs")
-    plt.xlabel("WAR (Wins Above Replacement")
+    plt.xlabel("WAR (Wins Above Replacement)")
     plt.ylabel("2026 Salary")
-    plt.tight_layout
+    plt.tight_layout()
     plt.savefig("WAR_by_salary.png")
     plt.show()
 
@@ -148,8 +152,22 @@ def analyze_pitching_data(df):
     pitcher_avg_age = df['Age'].mean()
     print(f"Average pitcher age: {pitcher_avg_age:.1f} yrs")
 
-    print(df_pitching.groupby('Pos')["SO/BB"].mean())
+    print(df.groupby('Pos')["SO/BB"].mean())
 
+
+# --- Main Pipeline --- 
+df_hitting = load_hitting_data("cubs_hitting_data.csv")
+df_pitching = load_pitching_data("cubs_pitching_data.csv")
+df_contracts = load_contract_data("cubs_contracts_data.csv")
+print("="*50)
+df_hitting = clean_hitter_data(df_hitting)
+df_pitching = clean_pitcher_data(df_pitching)
+df_contracts = clean_contracts_data(df_contracts)
+print("="*50)
+df_hitting = validate_hitter_data(df_hitting)
+df_pitching = validate_pitcher_data(df_pitching)
+df_contracts = validate_contracts_data(df_contracts)
+print("="*50)
 analyze_hitting_data(df_hitting)
 analyze_pitching_data(df_pitching)
 
