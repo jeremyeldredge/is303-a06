@@ -29,6 +29,7 @@ Outputs:
 import pandas as pd 
 import matplotlib.pyplot as plt
 
+# load both csv files into DataFrames
 def load_hitting_data(filepath):
     # load CSV and return a DataFrame
     df_hitting = pd.read_csv(filepath)
@@ -41,8 +42,15 @@ def load_pitching_data(filepath):
     print(f"Loaded {len(df_pitching)} rows from {filepath}")
     return df_pitching
 
+def load_contract_data(filepath):
+    # load CSV and return a DataFrame
+    df_contracts = pd.read_csv(filepath)
+    print(f"Loaded {len(df_contracts)} rows from {filepath}")
+    return df_contracts
+
 df_hitting = load_hitting_data("cubs_hitting_data.csv")
 df_pitching = load_pitching_data("cubs_pitching_data.csv")
+df_contracts = load_contract_data("cubs_contracts_data.csv")
 
 # clean data: remove pitchers from hitting data, remove symbols from names
 def clean_hitter_data(df):
@@ -72,20 +80,45 @@ def clean_pitcher_data(df):
     print(f"Cleaned {len(df)} rows from cubs_pitching_data.csv")
     return df
 
+def clean_contracts_data(df):
+    # clean 2026 salary into just a number
+    df['2026'] = df['2026'].str.replace('$','').str.replace('M','')
+    df['2026'] = pd.to_numeric(df['2026'], errors='coerce') * 1000000
+    df = df.dropna(subset=['2026'])
+
+    # remove unneccesary columns
+    df = df.drop(columns=['Yrs','Acquired','SrvTm','Agent','2027','2028','2029','2030','2031','2032','Name-additional'])
+
+    print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv\n")
+    return df
+
 df_hitting = clean_hitter_data(df_hitting)
 df_pitching = clean_pitcher_data(df_pitching)
+df_contracts = clean_contracts_data(df_contracts)
 
-def validate_data(df):
+# data validation
+def validate_hitter_data(df):
     assert df["BA"].notna().all(), "BA still has missing values"
+    assert len(df) > 0, "DataFrame is empty after cleaning"
+
+def validate_pitcher_data(df):
     assert df["SO/BB"].notna().all(), "SO/BB still has missing values"
     assert len(df) > 0, "DataFrame is empty after cleaning"
 
+def validate_contracts_data(df):
+    assert df["2026"].notna().all(), "2026 salary still has missing values"
+    assert (df['2026'] >= 1000000).all(), "2026 values not scaled to millions of dollars"
+    assert len(df) > 0, "DataFrame is empty after cleaning"
+
+# data analysis
+# avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO/BB rate of starters vs releivers (pitchers)
 def analyze_hitting_data(df):
-<<<<<<< HEAD
-    
-    hitter_avg_age = df[df['Age'].mean()]
-    return f"Average age of hitters: {hitter_avg_age:.1f}"
-=======
-    hitter_avg_age = df[df['Age'].mean()]
-    
->>>>>>> e15e8bfc15b47a20199ba34d7d8ce72fedaa0870
+
+    hitter_avg_age = df['Age'].mean()
+    print(f"Average hitter age: {hitter_avg_age:.1f}")
+
+    print("Average batting average by position:")
+    print(df.groupby("Pos")["BA"].mean().round(3).sort_values(ascending=False))
+
+
+print(df_contracts.head())
