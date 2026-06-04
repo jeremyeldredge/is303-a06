@@ -22,8 +22,8 @@ Processes:
 Outputs:
 - Avg age of pitchers and hitters (printed table)
 - Batting average per defensive position (printed table)
-- Bar chart of HR by salary (HR/$) saved as HR_by_salary.png
-- ERA and SO/BB rate starters vs releivers (printed table)
+- Bar chart of WAR by salary (HR/$) saved as WAR_by_salary.png
+- SO/BB rate starters vs releivers (printed table)
 """
 
 import pandas as pd 
@@ -131,6 +131,25 @@ def analyze_hitting_data(df):
     print("Average OPS by position:")
     print(df.groupby("Pos")["OPS"].mean().round(3).sort_values(ascending=False))
 
+    df_merged = df.merge(df_contracts, left_on='Player', right_on='Name')
+    df_merged["WAR per dollar"] = df_merged['WAR'] / df_merged['2026']
+    print(df_merged.groupby('Player')['WAR per dollar'].mean().sort_values(ascending=False))
+
+    plt.scatter(df_merged['WAR'], df_merged['2026'], color='green')
+    plt.title("WAR per Dollar - 2026 Chicago Cubs")
+    plt.xlabel("WAR (Wins Above Replacement")
+    plt.ylabel("2026 Salary")
+    plt.tight_layout
+    plt.savefig("WAR_by_salary.png")
+    plt.show()
+
 def analyze_pitching_data(df):
+
     pitcher_avg_age = df['Age'].mean()
     print(f"Average pitcher age: {pitcher_avg_age:.1f} yrs")
+
+    print(df_pitching.groupby('Pos')["SO/BB"].mean())
+
+analyze_hitting_data(df_hitting)
+analyze_pitching_data(df_pitching)
+
