@@ -11,25 +11,29 @@ Inputs:
     BA,OBP,SLG,OPS,OPS+,rOBA,Rbat+,TB,GIDP,HBP,SH,SF,IBB,Pos,Awards,Player-additional
 - cubs_pitching_data.csv: 28 rows, columns: Rk,Player,Age,Pos,WAR,W,L,W-L%,ERA,G,GS,GF,CG,SHO,SV,IP,H,
     R,ER,HR,BB,IBB,SO,HBP,BK,WP,BF,ERA+,FIP,WHIP,H9,HR9,BB9,SO9,SO/BB,Awards,Player-additional
+- cubs_contracts_data.csv: player salary data for 2026
 
 Processes:
-- load_data(): reads CSV into DataFrame
-- clean_data(): delete pitchers from hittig data, clean player names
-- validate_data(): assert no negative stats, verifies all values not null
-- analyze_data(): avg age of pitchers vs hitters (both), OPS by defensive position (hitters), WAR by salary (hitters), SO/BB rate of starters vs releivers (pitchers)
-- create_chart(): bar chart of HR by salary
+- load_hitting_data(), load_pitching_data(), load_contract_data(): each reads a CSV into a DataFrame
+- clean_hitter_data(): removes pitchers (rows with no BA), cleans player names, drops unused columns
+- clean_pitcher_data(): cleans player names, removes rows missing Pos or SO/BB, drops unused columns
+- clean_contracts_data(): parses 2026 salary strings to numeric values, drops unused columns
+- validate_hitter_data(), validate_pitcher_data(), validate_contracts_data(): assert key columns have no nulls and DataFrames are non-empty
+- analyze_hitting_data(): avg hitter age, OPS by defensive position, WAR per salary dollar; generates scatter plot
+- analyze_pitching_data(): avg pitcher age, SO/BB rate by position (SP vs RP)
 
 Outputs:
-- Avg age of pitchers and hitters (printed table)
-- Batting average per defensive position (printed table)
-- Bar chart of WAR by salary (HR/$) saved as WAR_by_salary.png
-- SO/BB rate starters vs releivers (printed table)
+- Average age of hitters (printed)
+- Average OPS by defensive position (printed table)
+- Scatter plot of WAR by 2026 salary saved as WAR_by_salary.png
+- Average age of pitchers (printed)
+- Average SO/BB rate by pitcher role (printed table)
 """
 
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-# data from https://www.baseball-reference.com/teams/CHC/2026.shtml
+
 
 # load both csv files into DataFrames
 def load_hitting_data(filepath):
@@ -135,12 +139,12 @@ def analyze_hitting_data(df):
     print(df.groupby("Pos")["OPS"].mean().round(3).sort_values(ascending=False))
 
     df_merged = df.merge(df_contracts, left_on='Player', right_on='Name')
-    df_merged["WAR per dollar"] = df_merged['WAR'] / df_merged['2026']
-    print(df_merged.groupby('Player')['WAR per dollar'].mean().sort_values(ascending=False))
+    df_merged["WAR per $1M"] = df_merged['WAR'] / df_merged['2026'] * 1000000
+    print(df_merged[['Player','WAR','2026','WAR per $1M']].sort_values('WAR per $1M', ascending = False).round(2))
 
     # chart must be created inside this function because df_merged is not global
     plt.scatter(df_merged['WAR'], df_merged['2026'], color='green')
-    plt.title("WAR per Dollar - 2026 Chicago Cubs")
+    plt.title("WAR per $1M - 2026 Chicago Cubs")
     plt.xlabel("WAR (Wins Above Replacement)")
     plt.ylabel("2026 Salary")
     plt.tight_layout()
@@ -152,7 +156,7 @@ def analyze_pitching_data(df):
     pitcher_avg_age = df['Age'].mean()
     print(f"Average pitcher age: {pitcher_avg_age:.1f} yrs")
 
-    print(df.groupby('Pos')["SO/BB"].mean())
+    print (f"SO/BB by role (SP vs RP): {df.groupby('Pos')["SO/BB"].mean()}")
 
 
 # --- Main Pipeline --- 

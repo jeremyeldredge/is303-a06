@@ -1,0 +1,16 @@
+What dataset did you use? Describe the data: how many rows and columns, what the columns represent, and where you got it.
+I used data on the Chicago Cubs from https://www.baseball-reference.com/teams/CHC/2026.shtml, which is a website that tracks MLB statistics. There are three different CSV files. The
+hittinng and pitching files contain performance stats from Cubs players so far this season. The stats I used in my program are player name, age, position, OPS (on base plus slugging percentage), 
+WAR (wins above replacement), and SO/BB (strikeouts-to-walk rate for pitchers). WAR and OPS are advanced statistics used to measure the impact of a player. cubs_hitting_data.csv has 21 rows
+and 34 columns, cubs_pitching_data.csv has 27 rows and 37 columns, and cubs_contracts_data has 46 rows and 15 columns.
+
+What did you find? Summarize 2 to 3 key findings from your analysis. Reference your groupby results and chart.
+I found that the left field position has the highest batting average on the team so far this year. I learned that on average, Cubs pitchers are older than Cubs hitters. I also learned, as
+seen in the scatter plot, that Pete Crow-Armstrong is the most "valuable" player because he has the best WAR/$1M. Lastly, I learned that starting pitchers get more strikeouts per walk than
+relief pitchers.
+
+
+What are the limitations? What could be misleading about your analysis? What additional data would make your conclusions stronger?
+The main limitation of this analysis is that I used the Cubs current 40-man roster, meaning that there aren't position substitutes. The left field posiiton having the highest OPS just
+means that the Cubs left fielder (Ian Happ) leads the team in OPS, as there are no other left fielders being analyzed here. Additional data that would strengthen my analysis would be
+the 40-man roster of every MLB team, or the data for every past Cubs team.
