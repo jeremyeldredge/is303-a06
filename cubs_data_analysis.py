@@ -81,16 +81,17 @@ def clean_pitcher_data(df):
     return df
 
 def clean_contracts_data(df):
-    # clean 2026 salary into just a number
-    df['2026'] = df['2026'].str.replace('$','').str.replace('M','')
-    df['2026'] = pd.to_numeric(df['2026'], errors='coerce') * 1000000
-    df = df.dropna(subset=['2026'])
+   df['2026'] = df['2026'].str.replace('$','').str.replace('M','').str.replace('k','')
+   df['2026'] = pd.to_numeric(df['2026'], errors='coerce') * 1_000_000
+   df.loc[df['Name'] == 'Pete Crow-Armstrong', '2026'] = df.loc[df['Name'] == 'Pete Crow-Armstrong', '2026'] / 1000  
+   # this player's salary is listed in thousands instead of millions, so divide by 1000 to correct
+   df = df.dropna(subset=['2026'])
 
-    # remove unneccesary columns
-    df = df.drop(columns=['Yrs','Acquired','SrvTm','Agent','2027','2028','2029','2030','2031','2032','Name-additional'])
+   # remove unneccesary columns
+   df = df.drop(columns=['Yrs','Acquired','Contract Status','SrvTm','Agent','2027','2028','2029','2030','2031','2032','Name-additional'])
 
-    print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv\n")
-    return df
+   print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv\n")
+   return df
 
 df_hitting = clean_hitter_data(df_hitting)
 df_pitching = clean_pitcher_data(df_pitching)
