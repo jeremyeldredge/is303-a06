@@ -5,9 +5,9 @@ WAR (wins above replacement), and SO/BB (strikeouts-to-walk rate for pitchers). 
 and 34 columns, cubs_pitching_data.csv has 27 rows and 37 columns, and cubs_contracts_data has 46 rows and 15 columns.
 
 What did you find? Summarize 2 to 3 key findings from your analysis. Reference your groupby results and chart.
-I found that the left field position has the highest batting average on the team so far this year. I learned that on average, Cubs pitchers are older than Cubs hitters. I also learned, as
-seen in the scatter plot, that Pete Crow-Armstrong is the most "valuable" player because he has the best WAR/$1M. Lastly, I learned that starting pitchers get more strikeouts per walk than
-relief pitchers.
+I found that the left field position has the highest OPS on the team so far this year, which is 0.819 (the MLB league average is about .700). I learned that on average, Cubs pitchers are older (31.6 yrs)
+than Cubs hitters (28.2 yrs). I also learned, as seen in the scatter plot, that Pete Crow-Armstrong is the most "valuable" player because he has the best WAR/$1M, bringing in 3.13 WAR per $1 million.
+Lastly, I learned that starting pitchers get more strikeouts per walk than relief pitchers, 3.27 vs 2.834.
 
 
 What are the limitations? What could be misleading about your analysis? What additional data would make your conclusions stronger?
