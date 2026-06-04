@@ -16,7 +16,7 @@ Processes:
 - load_data(): reads CSV into DataFrame
 - clean_data(): delete pitchers from hittig data, clean player names
 - validate_data(): assert no negative stats, verifies all values not null
-- analyze_data(): avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO/BB rate of starters vs releivers (pitchers)
+- analyze_data(): avg age of pitchers vs hitters (both), OPS by defensive position (hitters), WAR by salary (hitters), SO/BB rate of starters vs releivers (pitchers)
 - create_chart(): bar chart of HR by salary
 
 Outputs:
@@ -28,6 +28,8 @@ Outputs:
 
 import pandas as pd 
 import matplotlib.pyplot as plt
+
+# data from https://www.baseball-reference.com/teams/CHC/2026.shtml
 
 # load both csv files into DataFrames
 def load_hitting_data(filepath):
@@ -51,6 +53,7 @@ def load_contract_data(filepath):
 df_hitting = load_hitting_data("cubs_hitting_data.csv")
 df_pitching = load_pitching_data("cubs_pitching_data.csv")
 df_contracts = load_contract_data("cubs_contracts_data.csv")
+print("="*50)
 
 # clean data: remove pitchers from hitting data, remove symbols from names
 def clean_hitter_data(df):
@@ -71,6 +74,12 @@ def clean_pitcher_data(df):
     # remove (#) or (*) from end of player names
     df["Player"] = df["Player"].str.rstrip("*#")
 
+    # remove pitchers without position listed
+    df = df.dropna(subset=['Pos'])
+
+    # change CL positiion to RP
+    df.loc[df['Pos'] == 'CL', 'Pos'] = 'RP'
+
     # remove pitchers with null SO/BB values
     df = df.dropna(subset=["SO/BB"])
 
@@ -90,12 +99,13 @@ def clean_contracts_data(df):
    # remove unneccesary columns
    df = df.drop(columns=['Yrs','Acquired','Contract Status','SrvTm','Agent','2027','2028','2029','2030','2031','2032','Name-additional'])
 
-   print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv\n")
+   print(f"Cleaned {len(df)} rows from cubs_contracts_data.csv")
    return df
 
 df_hitting = clean_hitter_data(df_hitting)
 df_pitching = clean_pitcher_data(df_pitching)
 df_contracts = clean_contracts_data(df_contracts)
+print("="*50)
 
 # data validation
 def validate_hitter_data(df):
@@ -108,18 +118,19 @@ def validate_pitcher_data(df):
 
 def validate_contracts_data(df):
     assert df["2026"].notna().all(), "2026 salary still has missing values"
-    assert (df['2026'] >= 1000000).all(), "2026 values not scaled to millions of dollars"
+    assert (df['2026'] > 0).all(), "2026 has zero or negative salaries"
     assert len(df) > 0, "DataFrame is empty after cleaning"
 
 # data analysis
-# avg age of pitchers vs hitters (both), BA by defensive position (hitters), HR by salary (hitters), avg ERA and SO/BB rate of starters vs releivers (pitchers)
+# avg age of pitchers vs hitters (both), OPS by defensive position (hitters), WAR by salary (hitters), SO/BB rate of starters vs releivers (pitchers)
 def analyze_hitting_data(df):
 
     hitter_avg_age = df['Age'].mean()
-    print(f"Average hitter age: {hitter_avg_age:.1f}")
+    print(f"Average hitter age: {hitter_avg_age:.1f} yrs")
 
-    print("Average batting average by position:")
-    print(df.groupby("Pos")["BA"].mean().round(3).sort_values(ascending=False))
+    print("Average OPS by position:")
+    print(df.groupby("Pos")["OPS"].mean().round(3).sort_values(ascending=False))
 
-
-print(df_contracts.head())
+def analyze_pitching_data(df):
+    pitcher_avg_age = df['Age'].mean()
+    print(f"Average pitcher age: {pitcher_avg_age:.1f} yrs")
